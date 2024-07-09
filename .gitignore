@@ -1,0 +1,4 @@
+outputs/
+PPO_logs_e/
+PPO_preTrained/
+.venv/
