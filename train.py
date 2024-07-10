@@ -44,7 +44,7 @@ def train(cfg):
           os.makedirs(log_dir)
 
     #### get number of log files in log directory
-    run_num = cfg.cfg.random_seed
+    run_num = cfg.random_seed
 
     #### create new log file for each run
     log_f_name = log_dir + '/PPO_' + cfg.mode + "_log_" + str(run_num) + ".csv"
@@ -77,8 +77,8 @@ def train(cfg):
 
     # initialize the PPO and DQN agent
     ppo_agent = PPO(state_dim, ppo_action_dim, cfg.PPO.lr_actor, 
-                    cfg.PPO.lr_critic, cfg.PPO.gamma, cfg.PPO.K_epochs, 
-                    cfg.PPO.eps_clip, cfg.PPO.has_continuous_action_space, 
+                    cfg.PPO.lr_critic, cfg.gamma, cfg.PPO.K_epochs, 
+                    cfg.PPO.eps_clip, cfg.has_continuous_action_space, 
                     cfg.PPO.action_std)
     dqn = DQN(state_dim, dqn_action_dim, cfg.DQN.lr, cfg.DQN.epsilon, 
               cfg.DQN.target_iter_replace, cfg.DQN.batch_size, cfg.gamma)
@@ -155,12 +155,12 @@ def train(cfg):
                 dqn.learn()
 
             # update PPO agent
-            if time_step % cfg.update_timestep == 0:
+            if time_step % cfg.PPO.update_timestep == 0:
                 ppo_agent.update()
 
             # if continuous action space; then decay action std of ouput action distribution
             if (cfg.has_continuous_action_space and 
-                time_step % cfg.action_std_decay_freq == 0):
+                time_step % cfg.PPO.action_std_decay_freq == 0):
                 ppo_agent.decay_action_std(cfg.action_std_decay_rate, 
                                            cfg.min_action_std)
 

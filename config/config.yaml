@@ -1,6 +1,6 @@
 ---
 text_file: ""
-nogui: false
+nogui: True
 test: false
 random_seed: 0
 max_ep_len: 2000
@@ -18,8 +18,8 @@ PPO:
 DQN:
   lr: 0.001
   epsilon: 0.1
-  target_replace_iter: 8000
   batch_size: 128
+  target_iter_replace: 8000
 
 total_test_episodes: 990
 total_train_episodes: 5000
