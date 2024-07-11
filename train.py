@@ -43,7 +43,6 @@ def train(cfg):
     if not os.path.exists(log_dir):
           os.makedirs(log_dir)
 
-    #### get number of log files in log directory
     run_num = cfg.random_seed
 
     #### create new log file for each run
@@ -161,8 +160,8 @@ def train(cfg):
             # if continuous action space; then decay action std of ouput action distribution
             if (cfg.has_continuous_action_space and 
                 time_step % cfg.PPO.action_std_decay_freq == 0):
-                ppo_agent.decay_action_std(cfg.action_std_decay_rate, 
-                                           cfg.min_action_std)
+                ppo_agent.decay_action_std(cfg.PPO.action_std_decay_rate, 
+                                           cfg.PPO.min_action_std)
 
             # log in logging file
             if time_step % log_freq == 0:
@@ -170,7 +169,7 @@ def train(cfg):
                 # log average reward till last episode
                 log_avg_reward2 = round(log_dqn_running_reward / log_running_episodes, 4)
                 log_avg_reward = round(log_ppo_running_reward / log_running_episodes, 4)
-                log_avg_reward_avg = 1/2*(log_avg_reward + log_avg_reward2)
+                log_avg_reward_avg = round(1/2*(log_avg_reward + log_avg_reward2), 4)
 
                 log_f.write('{},{},{},{},{}\n'.format(i_episode, time_step, 
                                                       log_avg_reward, 
