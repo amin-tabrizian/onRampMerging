@@ -6,6 +6,7 @@ import optparse
 from gym import spaces
 import torch
 from classifier import model
+from utils import *
 
 
 maxSteps = 200
@@ -19,8 +20,6 @@ else:
 import traci
 from sumolib import checkBinary
 
-def getDistance(pos1, pos2):
-    return np.sqrt((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
 
 def safetyCheck(state, action):
     # behindVeh = state[0]
@@ -43,10 +42,49 @@ def safetyCheck(state, action):
     # elif egoVeh[1] == frontveh[1] and nexPosition > (frontveh[0] + frontveh[2])*moveSafetyFactor:
     #     action[0] = -1
     #     print('changing acceleration')
-    
     return action
 
+def getState2(radius, size = 99):
+    veh_behind_list = []
+    veh_ahead_list = []
+    veh_behind_number = 0
+    veh_ahead_number = 0
 
+    egoPos = traci.vehicle.getPosition('t_0')
+    egoVel = traci.vehicle.getSpeed('t_0')
+    if egoPos[0] < 0:
+        raise Exception()
+    ego = [list(egoPos) + [egoVel]]
+
+    for vehID in traci.vehicle.getIDList():
+        if vehID == 't_0':
+            continue
+        vehPos = traci.vehicle.getPosition(vehID)
+        if getDistance(egoPos, vehPos) <= radius:
+            vehVel = traci.vehicle.getSpeed(vehID) 
+            vehList = list(vehPos) + [vehVel]
+            with torch.no_grad():
+                drivingstyle = model(torch.from_numpy(np.ndarra(vehList))).numpy() 
+
+            if  vehPos < egoPos:
+                veh_behind_list.append(vehList)
+                veh_behind_number += 1
+            else:
+                veh_ahead_list.append(vehList)
+                veh_ahead_number += 1
+    veh_behind_list = sorted(veh_behind_list, 
+                             key= lambda x: [-x[1], x[0]])
+    veh_ahead_list = sorted(veh_ahead_list, 
+                            key= lambda x: [-x[1], -x[0]],
+                            reverse=True)
+
+    raw_state = flatten(veh_behind_list + ego + veh_ahead_list)
+
+    behind_padding = list(np.zeros(3*(int((size - 1)/2) - veh_behind_number)))
+    ahead_padding = list(np.zeros(3*(int((size - 1)/2) - veh_ahead_number)))
+    padded_state = behind_padding + raw_state + ahead_padding
+
+    return padded_state
 
 def getVehList(radius):
     egoPos = traci.vehicle.getPosition('t_0')
@@ -54,6 +92,7 @@ def getVehList(radius):
     if egoPos[0] < 0:
         raise Exception()
     vehListInfo = [list(egoPos) + [egoVel]]
+
     for vehID in traci.vehicle.getIDList():
         if vehID == 't_0':
             continue
@@ -61,7 +100,7 @@ def getVehList(radius):
         if getDistance(egoPos, vehPos) <= radius:
             vehVel = traci.vehicle.getSpeed(vehID)  
             vehListInfo.append(list(vehPos) + [vehVel])
-    vehListInfo = [vehListInfo[0]] + sorted(vehListInfo[1:], key= lambda x: (x[0], x[1]))
+    vehListInfo = [vehListInfo[0]] + sorted(vehListInfo[1:], key= lambda x: [x[0], x[1]])
     return vehListInfo
 
 def getState(radius, size = 99):
@@ -108,7 +147,7 @@ def getState(radius, size = 99):
 
 def getReward(vehListInfo, action, laneID):
 
-    r1 = -0.1*np.abs(action[0])  -0.1
+    r1 = -0.1*np.abs(action[0]) - 0.1
     r2 = 0
 
     if 't_0' in traci.simulation.getCollidingVehiclesIDList():
@@ -256,6 +295,7 @@ class Merging():
                 self.state = observationArray
             else:
                 observationArray = getState(self.radius, self.size)
+                observationArray2 = getState2(self.radius, self.size)
                 self.state = observationArray
 
         self.reward = getReward(observationArray, action, self.laneID)
