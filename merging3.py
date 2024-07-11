@@ -44,46 +44,50 @@ def safetyCheck(state, action):
     #     print('changing acceleration')
     return action
 
-def getState2(radius, size = 99):
+def getState2(radius, size= 99, mode= 'plain'):
+
+    # Initialize behind and ahead vehicles list
     veh_behind_list = []
     veh_ahead_list = []
     veh_behind_number = 0
     veh_ahead_number = 0
 
+    # Get ego vehicles' pos and vel
     egoPos = traci.vehicle.getPosition('t_0')
     egoVel = traci.vehicle.getSpeed('t_0')
     if egoPos[0] < 0:
         raise Exception()
     ego = [list(egoPos) + [egoVel]]
 
+    # Get surrounding vehicles pos and vel
     for vehID in traci.vehicle.getIDList():
         if vehID == 't_0':
             continue
         vehPos = traci.vehicle.getPosition(vehID)
-        if getDistance(egoPos, vehPos) <= radius:
+
+        # Add to the list if the vehicle is in radius
+        if getDistance(egoPos, vehPos) <= radius: 
             vehVel = traci.vehicle.getSpeed(vehID) 
             vehList = list(vehPos) + [vehVel]
-            with torch.no_grad():
-                drivingstyle = model(torch.from_numpy(np.ndarra(vehList))).numpy() 
-
             if  vehPos < egoPos:
                 veh_behind_list.append(vehList)
                 veh_behind_number += 1
             else:
                 veh_ahead_list.append(vehList)
                 veh_ahead_number += 1
+
+    # Sort behind and ahead vehicle lists. 
     veh_behind_list = sorted(veh_behind_list, 
                              key= lambda x: [-x[1], x[0]])
     veh_ahead_list = sorted(veh_ahead_list, 
                             key= lambda x: [-x[1], -x[0]],
                             reverse=True)
-
     raw_state = flatten(veh_behind_list + ego + veh_ahead_list)
 
+    # Zero padd
     behind_padding = list(np.zeros(3*(int((size - 1)/2) - veh_behind_number)))
     ahead_padding = list(np.zeros(3*(int((size - 1)/2) - veh_ahead_number)))
     padded_state = behind_padding + raw_state + ahead_padding
-
     return padded_state
 
 def getVehList(radius):
@@ -261,7 +265,8 @@ class Merging():
             else:
                 self.laneID = ''
 
-            traci.vehicle.setAcceleration(vehID='t_0',duration= 1, acceleration= action[0])
+            traci.vehicle.setAcceleration(vehID='t_0',duration= 1, 
+                                          acceleration= action[0])
             for vehicle_name in traci.simulation.getDepartedIDList():
                 if 'f_1' in vehicle_name:
                     traci.vehicle.setTau(vehicle_name, np.random.uniform(0.1, 0.7))
