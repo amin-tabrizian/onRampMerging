@@ -2,4 +2,5 @@ outputs/
 PPO_logs/
 PPO_preTrained/
 .venv/
+tripinfo.xml
 *.out
