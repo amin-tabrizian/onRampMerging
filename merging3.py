@@ -5,7 +5,6 @@ import optparse
 # from inference import model
 from gym import spaces
 import torch
-from classifier import model
 from utils import *
 
 
@@ -44,7 +43,7 @@ def safetyCheck(state, action):
     #     print('changing acceleration')
     return action
 
-def getState(radius, size= 99, mode= 'plain'):
+def getState(radius, size= 99, mode= 'Plain'):
 
     # Initialize behind and ahead vehicles list
     veh_behind_list = []
@@ -65,10 +64,12 @@ def getState(radius, size= 99, mode= 'plain'):
             continue
         vehPos = traci.vehicle.getPosition(vehID)
 
+
         # Add to the list if the vehicle is in radius
         if getDistance(egoPos, vehPos) <= radius: 
             vehVel = traci.vehicle.getSpeed(vehID) 
             vehList = list(vehPos) + [vehVel]
+
             if  vehPos < egoPos:
                 veh_behind_list.append(vehList)
                 veh_behind_number += 1
@@ -82,19 +83,35 @@ def getState(radius, size= 99, mode= 'plain'):
     veh_ahead_list = sorted(veh_ahead_list, 
                             key= lambda x: [-x[1], -x[0]],
                             reverse=True)
+    raw_state_non_ego = flatten(veh_behind_list + veh_ahead_list)
     raw_state = flatten(veh_behind_list + ego + veh_ahead_list)
 
     # Zero padd
     behind_padding = list(np.zeros(3*(int((size - 1)/2) - veh_behind_number)))
     ahead_padding = list(np.zeros(3*(int((size - 1)/2) - veh_ahead_number)))
-    padded_state = behind_padding + raw_state + ahead_padding
+    
+
+    if  mode == 'SLSC' or mode == 'SC':
+        padded_state = behind_padding + raw_state_non_ego + ahead_padding
+        driving_style = list(predict_driving_style(padded_state))
+        padded_state_driving_style = []
+
+        for i in np.arange(0, int(len(padded_state)/3)):
+            if i == 15:
+                padded_state_driving_style += flatten(ego)
+            padded_state_driving_style += padded_state[3*i:3*i+3]
+            padded_state_driving_style += driving_style[3*i:3*i+3]
+        padded_state = padded_state_driving_style
+    else:
+        padded_state = behind_padding + raw_state + ahead_padding
     return padded_state
 
 
 
-def getReward(vehListInfo, action, laneID):
-
-    r1 = -0.01*np.abs(action[0]) - 0.01
+def getReward(state, action, laneID):
+    # ego_start_idx = int((len(state) - 1)/2) -1
+    # ego_pos = state[ego_start_idx:ego_start_idx + 2]
+    r1 = -0.01*np.abs(action[0]) - 0.05
     r2 = 0
 
     if 't_0' in traci.simulation.getCollidingVehiclesIDList():
@@ -126,7 +143,7 @@ def getReward(vehListInfo, action, laneID):
 
 class Merging():
     def __init__(self, options, seed, radius = 50, render_mode= None):
-    
+        mode = options.mode
         self.done = False
         self.observation = []
         self.reward = 0
@@ -142,12 +159,20 @@ class Merging():
             self.sumoBinary = checkBinary('sumo')
         else:
             self.sumoBinary = checkBinary('sumo-gui')
-
-        low_space = np.tile(np.float32([-1000, -1000, 0]), reps= self.size)
-        high_space = np.tile(np.float32([1000, 1000, 50]), reps= self.size)
-        self.observation_space = spaces.Box(low = low_space, 
-                                            high = high_space, 
-                                            dtype=np.float32)
+        if  mode == 'SLSC' or mode == 'SC':
+            low_space = np.tile(np.float32([-1000]), 
+                                reps= (self.size - 1)*6 + 3)
+            high_space = np.tile(np.float32([1000]), 
+                                reps= (self.size - 1)*6 + 3)
+            self.observation_space = spaces.Box(low = low_space, 
+                                                high = high_space, 
+                                                dtype=np.float32)
+        else:
+            low_space = np.tile(np.float32([-1000, -1000, 0]), reps= self.size)
+            high_space = np.tile(np.float32([1000, 1000, 50]), reps= self.size)
+            self.observation_space = spaces.Box(low = low_space, 
+                                                high = high_space, 
+                                                dtype=np.float32)
 
         self.action_space = spaces.Box(low = -1,  high = 1, shape= (2,))
 
@@ -157,12 +182,14 @@ class Merging():
 
 
     def reset(self, options=None):
+        HOME = '/home/amin/onRampMerging'
+        SUMO = '/sumo_files/mergingP.sumocfg'
         # super().reset()
         try:
             # traci.start([self.sumoBinary, "-c", "mergingP.sumocfg",
             #             "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
             #             "--random", "--step-length", "0.1", "--collision.check-junctions"])
-            traci.start([self.sumoBinary, "-c", "sumo_files/mergingP.sumocfg",
+            traci.start([self.sumoBinary, "-c", HOME + SUMO,
                         "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
                         "--random", "--collision.check-junctions", "--collision.action", "remove"])
         except:
@@ -170,7 +197,7 @@ class Merging():
             # traci.start([self.sumoBinary, "-c", "mergingP.sumocfg",
             #             "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
             #             "--random", "--step-length", "0.1", "--collision.check-junctions"])
-            traci.start([self.sumoBinary, "-c", "sumo_files/mergingP.sumocfg",
+            traci.start([self.sumoBinary, "-c", HOME + SUMO,
                         "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
                         "--random", "--collision.check-junctions", "--collision.action", "remove"])
         
@@ -183,7 +210,7 @@ class Merging():
                 self.ego_inserted = True
                 traci.vehicle.setSpeedMode("t_0", 32)
                 traci.vehicle.setLaneChangeMode('t_0', 0b000000000000)
-                self.state = getState(self.radius, self.size)
+                self.state = getState(self.radius, self.size, self.options.mode)
                 # print('ego inserted')
                 
 
@@ -236,15 +263,15 @@ class Merging():
                 print('Terminating episode since it exceeded maximum time.')
                 info = True
                 self.done = True
-                observationArray = getState(self.radius, self.size)
+                observationArray = getState(self.radius, self.size, self.options.mode)
                 self.state = observationArray
             elif 't_0' in traci.simulation.getEmergencyStoppingVehiclesIDList():
                 self.done = True
                 info = True
-                observationArray = getState(self.radius, self.size)
+                observationArray = getState(self.radius, self.size, self.options.mode)
                 self.state = observationArray
             else:
-                observationArray = getState(self.radius, self.size)
+                observationArray = getState(self.radius, self.size, self.options.mode)
                 self.state = observationArray
 
         self.reward = getReward(observationArray, action, self.laneID)

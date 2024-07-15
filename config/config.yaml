@@ -2,14 +2,14 @@
 text_file: ""
 nogui: True
 test: false
-random_seed: 0
+random_seed: 400
 max_ep_len: 2000
 gamma: 0.99
 PPO:
   action_std: 0.8
   action_std_decay_rate: 0.05
   min_action_std: 0.05
-  action_std_decay_freq: 15000
+  action_std_decay_freq: 50000
   update_timestep: 20000
   K_epochs: 300
   eps_clip: 0.2
@@ -22,12 +22,11 @@ DQN:
   target_iter_replace: 8000
 
 total_test_episodes: 990
-total_train_episodes: 5000
-mode: "Plain"
+mode: "SLSC"
 testSeed: null
 delay: null
 has_continuous_action_space: True  
-max_training_timesteps: 360000   
+max_training_timesteps: 1000000   
 log_freq: ${max_ep_len} * 2          
 save_model_freq: 5000     
 memory_capacity: 20000   

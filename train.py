@@ -61,12 +61,11 @@ def train(cfg):
           os.makedirs(directory)
 
 
-    checkpoint_path = directory + "PPO_{}_{}_{}.pth".format(cfg.mode, 
-                                                            cfg.random_seed,
-                                                            run_num)
-    checkpoint_path_dqn = directory + "DQN_{}_{}_{}.pth".format(cfg.mode, 
-                                                                cfg.random_seed,
-                                                                run_num)
+    checkpoint_path = directory + "PPO_{}_{}.pth".format(cfg.mode, 
+                                                            cfg.random_seed)
+    checkpoint_path_dqn = directory + "DQN_{}_{}.pth".format(cfg.mode, 
+                                                                cfg.random_seed)
+                                                            
     
     #####################################################
 
