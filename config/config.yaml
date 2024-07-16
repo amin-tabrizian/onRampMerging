@@ -2,7 +2,7 @@
 text_file: ""
 nogui: True
 test: false
-random_seed: 400
+random_seed: 000
 max_ep_len: 2000
 gamma: 0.99
 PPO:
@@ -24,7 +24,7 @@ DQN:
 total_test_episodes: 990
 mode: "SLSC"
 testSeed: null
-delay: null
+delay: 0
 has_continuous_action_space: True  
 max_training_timesteps: 1000000   
 log_freq: ${max_ep_len} * 2          

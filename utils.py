@@ -56,4 +56,3 @@ def predict_driving_style(non_ego_state):
         output = np.rint(output).astype(int)
     return output
 
-

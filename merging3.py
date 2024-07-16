@@ -48,8 +48,10 @@ def getState(radius, size= 99, mode= 'Plain'):
     # Initialize behind and ahead vehicles list
     veh_behind_list = []
     veh_ahead_list = []
+    lower_radius = 10
     veh_behind_number = 0
     veh_ahead_number = 0
+    nonComList = []
 
     # Get ego vehicles' pos and vel
     egoPos = traci.vehicle.getPosition('t_0')
@@ -66,16 +68,20 @@ def getState(radius, size= 99, mode= 'Plain'):
 
 
         # Add to the list if the vehicle is in radius
-        if getDistance(egoPos, vehPos) <= radius: 
-            vehVel = traci.vehicle.getSpeed(vehID) 
+        if getDistance(egoPos, vehPos) <= radius:
+            
+            vehVel = traci.vehicle.getSpeed(vehID)
             vehList = list(vehPos) + [vehVel]
-
-            if  vehPos < egoPos:
-                veh_behind_list.append(vehList)
-                veh_behind_number += 1
-            else:
-                veh_ahead_list.append(vehList)
-                veh_ahead_number += 1
+            
+            if ('n_0' in vehID \
+                and getDistance(egoPos, vehPos) <= lower_radius) \
+                or ('n_0' not in vehID):
+                if  vehPos < egoPos:
+                    veh_behind_list.append(vehList)
+                    veh_behind_number += 1
+                else:
+                    veh_ahead_list.append(vehList)
+                    veh_ahead_number += 1
 
     # Sort behind and ahead vehicle lists. 
     veh_behind_list = sorted(veh_behind_list, 
