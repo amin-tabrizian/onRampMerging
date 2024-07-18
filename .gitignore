@@ -1,0 +1,8 @@
+outputs/
+multirun/
+PPO_logs/
+PPO_preTrained/
+state_predictor/
+*.xml
+*.out
+.venv/
