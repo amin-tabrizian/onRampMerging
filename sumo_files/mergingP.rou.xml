@@ -5,10 +5,10 @@
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
     <!-- VTypes -->
-    <vType id="aggressive" length="5.00" maxSpeed="10.62" vClass="passenger" color="orange" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0"/>
-    <vType id="noncav" length="5.00" maxSpeed="10.62" vClass="passenger" color="white" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0"/>
-    <vType id="cooperative" length="5.00" maxSpeed="10.62" vClass="passenger" color="blue" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0"/>
-    <vType id="secondLane" length="5.00" maxSpeed="12.21" vClass="passenger" color="yellow" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0"/>
+    <vType id="aggressive" length="5.00" maxSpeed="10.62" vClass="passenger" color="orange" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0" decel="0.1" emergencyDecel="0.1"/>
+    <vType id="noncav" length="5.00" maxSpeed="10.62" vClass="passenger" color="white" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0" decel="0.1" emergencyDecel="0.1"/>
+    <vType id="cooperative" length="5.00" maxSpeed="10.62" vClass="passenger" color="blue" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0" decel="0.1" emergencyDecel="0.1"/>
+    <vType id="secondLane" length="5.00" maxSpeed="12.21" vClass="passenger" color="yellow" carFollowModel="IDM" lcStrategic="-1" lcCooperative="-1" lcSpeedGain="0" lcKeepRight="0" lcOvertakeRight="0" decel="0.1" emergencyDecel="0.1"/>
     <vType id="ego" length="5.00" maxSpeed="12.21" vClass="passenger" color="red" carFollowModel="IDM"/>
     <!-- Vehicles, persons and containers (sorted by depart) -->
     <flow id="f_0" type="secondLane" begin="0.00" departLane="1" from="E2" to="E0" end="100.00" probability="0.47"/>

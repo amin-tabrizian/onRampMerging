@@ -1,8 +1,13 @@
 ---
+defaults:
+  - override hydra/launcher: joblib
+hydra:
+  job:
+    chdir: false
 text_file: ""
 nogui: True
 test: false
-random_seed: 000
+random_seed: 001
 max_ep_len: 2000
 gamma: 0.99
 PPO:
