@@ -6,3 +6,6 @@ state_predictor/
 *.xml
 *.out
 .venv/
+.vscode/
+__pycache__/
+
