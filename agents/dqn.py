@@ -9,15 +9,10 @@ MEMORY_CAPACITY = 20000
 class Net(nn.Module):
     def __init__(self, n_states, n_actions):
         super(Net, self).__init__()
-<<<<<<< HEAD
-        self.fc1 = nn.Linear(n_states, 128)
-        self.fc1.weight.data.normal_(0, 0.1)   # initialization
-=======
         self.fc1 = nn.Linear(n_states, 256)
         self.fc1.weight.data.normal_(0, 0.1)   # initialization
         self.fc2 = nn.Linear(256, 128)
         self.fc2.weight.data.normal_(0, 0.1)   # initialization
->>>>>>> symmetric
         self.out = nn.Linear(128, n_actions)
         self.softmax = nn.Softmax(dim=-1)
         self.out.weight.data.normal_(0, 0.1)   # initialization
@@ -27,11 +22,8 @@ class Net(nn.Module):
     def forward(self, x):
         x = self.fc1(x)
         x = F.relu(x)
-<<<<<<< HEAD
-=======
         x = self.fc2(x)
         x = F.relu(x)
->>>>>>> symmetric
         x = self.out(x)
         # actions_value = self.softmax(x)
         actions_value = x

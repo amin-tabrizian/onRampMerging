@@ -261,8 +261,7 @@ class Merging():
                 info = True
                 self.done = True
                 observationArray = self.state
-            elif 't_0' in traci.simulation.getArrivedIDList() or \
-                traci.simulation.getTime() > maxSteps:
+            elif 't_0' in traci.simulation.getArrivedIDList():
                 self.done = True
                 observationArray = self.state
             elif  traci.simulation.getTime() > maxSteps:
