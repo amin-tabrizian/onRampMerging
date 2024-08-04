@@ -3,6 +3,7 @@ tripinfo.xml
 outputs/
 multirun/
 TD3_logs/
+sl_agent/
 TD3_preTrained/
 PPO_logs/
 PPO_preTrained/
