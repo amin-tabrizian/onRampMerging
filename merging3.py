@@ -99,7 +99,7 @@ def getState(radius, size= 99, mode= 'Plain'):
 
     if  mode == 'SLSC' or mode == 'SC':
         padded_state = behind_padding + raw_state_non_ego + ahead_padding
-        driving_style = list(predict_driving_style(padded_state))
+        driving_style = list(20*predict_driving_style(padded_state))
         padded_state_driving_style = []
 
         for i in np.arange(0, int(len(padded_state)/3)):
