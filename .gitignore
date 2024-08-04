@@ -1,11 +1,12 @@
 tripinfo.xml
 .venv/
+outputs/
 multirun/
 TD3_logs/
 TD3_preTrained/
 PPO_logs/
 PPO_preTrained/
 state_predictor/
-*.out/
+*.out
 
 
