@@ -99,7 +99,7 @@ def getState(radius, size= 99, mode= 'Plain'):
 
     if  mode == 'SLSC' or mode == 'SC':
         padded_state = behind_padding + raw_state_non_ego + ahead_padding
-        driving_style = list(20*predict_driving_style(padded_state))
+        driving_style = list(1*predict_driving_style(padded_state))
         padded_state_driving_style = []
 
         for i in np.arange(0, int(len(padded_state)/3)):
@@ -117,7 +117,7 @@ def getState(radius, size= 99, mode= 'Plain'):
 def getReward(state, action, laneID):
     # ego_start_idx = int((len(state) - 1)/2) -1
     # ego_pos = state[ego_start_idx:ego_start_idx + 2]
-    r1 = -0.01*np.abs(action[0]) - 0.05
+    r1 = -0.01*np.abs(action[0]) - 1
     r2 = 0
 
     if 't_0' in traci.simulation.getCollidingVehiclesIDList():
