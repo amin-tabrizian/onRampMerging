@@ -1,0 +1,37 @@
+============================================================================================
+Device set to : NVIDIA RTX A6000
+============================================================================================
+===================================================================
+Device set to : NVIDIA RTX A6000
+Started training at (GMT) :  2024-08-13 10:27:35
+===================================================================
+ Retrying in 1 seconds
+PPO reward is 10.565955500489107 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 10.064961810093838 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is -3.2122264873003585 and DQN reward is -20.0
+ Retrying in 1 seconds
+PPO reward is 10.463303152892742 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 10.761011706956664 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 9.760864446176674 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 9.964508873623336 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is -27.134002792701125 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 10.36045182840643 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 11.364973880808218 and DQN reward is 20.0
+ Retrying in 1 seconds
+PPO reward is 11.8654842843432 and DQN reward is 20.0
+Number of collisions in 10 is 2 for mode Plain and random seed 100: 
+Total reward for PPO is 6.482528620378865 and for DQN is 18.0
+Collision rate is: 20.0%
+===================================================================
+Started training at (GMT) :  2024-08-13 10:27:35
+Finished training at (GMT) :  2024-08-13 10:27:54
+Total training time  :  0:00:19
+===================================================================

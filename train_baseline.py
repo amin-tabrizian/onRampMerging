@@ -33,8 +33,7 @@ def train(cfg):
 
     # state and action space dimension
     state_dim = env.observation_space.shape[0]
-    ppo_action_dim = 1
-    dqn_action_dim = 2
+    ppo_action_dim = 2
 
     ###################### logging ######################
 
@@ -46,8 +45,7 @@ def train(cfg):
     run_num = cfg.random_seed
 
     #### create new log file for each run
-    log_f_name = log_dir + '/PPO_' + cfg.mode + str(cfg.delay) + \
-                    "_log_" + str(run_num) + ".csv"
+    log_f_name = log_dir + '/PPO_' + cfg.mode + "_log_" + str(run_num) + ".csv"
 
     print("current logging run number for " + env_name + " : ", run_num)
     print("logging at : " + log_f_name)
@@ -62,11 +60,9 @@ def train(cfg):
           os.makedirs(directory)
 
 
-    checkpoint_path = directory + "PPO_{}_{}.pth".format(cfg.mode + str(cfg.delay), 
+    checkpoint_path = directory + "PPO_{}_{}.pth".format(cfg.mode, 
                                                             cfg.random_seed)
-    checkpoint_path_dqn = directory + "DQN_{}_{}.pth".format(cfg.mode + str(cfg.delay), 
-                                                                cfg.random_seed)
-                                                            
+
     
     #####################################################
 
@@ -79,8 +75,8 @@ def train(cfg):
                     cfg.PPO.lr_critic, cfg.gamma, cfg.PPO.K_epochs, 
                     cfg.PPO.eps_clip, cfg.has_continuous_action_space, 
                     cfg.PPO.action_std)
-    dqn = DQN(state_dim, dqn_action_dim, cfg.DQN.lr, cfg.DQN.epsilon, 
-              cfg.DQN.target_iter_replace, cfg.DQN.batch_size, cfg.gamma)
+    # dqn = DQN(state_dim, dqn_action_dim, cfg.DQN.lr, cfg.DQN.epsilon, 
+    #           cfg.DQN.target_iter_replace, cfg.DQN.batch_size, cfg.gamma)
     run_num_pretrained = 7      #### set this to load a particular checkpoint num
 
     # directory = "PPO_preTrained" + '/' + env_name + '/'
@@ -119,39 +115,37 @@ def train(cfg):
             ppo_action = ppo_agent.select_action(state)
             
             if laneID == 'E3_0':
-                dqn_action = dqn.select_action(state)
+                dqn_action = ppo_action[1]
                 # print('dqn takes action')
             else:
                 dqn_action = 0
             
             
             action = [float(ppo_action[0]), dqn_action]
+            # print(action)
             observation, reward, done, info = env.step(action)
-            ppo_reward = reward[0]
-            dqn_reward = reward[1]
+            reward = reward
             laneID = info['lane']
             # print(reward)
             # print(state.shape)
 
             # saving reward and is_terminals
-            ppo_agent.buffer.rewards.append(ppo_reward)
+            ppo_agent.buffer.rewards.append(reward)
             ppo_agent.buffer.is_terminals.append(done)
             action = info['action']
             ppo_action = action[0]
             dqn_action = action[1]
             
-            if laneID == 'E3_0':
-                dqn.store_transition(state, dqn_action,
-                                      dqn_reward, observation)
+            # if laneID == 'E3_0':
+            #     dqn.store_transition(state, dqn_action,
+            #                           dqn_reward, observation)
             
             
             time_step +=1
-            current_ppo_ep_reward += ppo_reward
-            current_dqn_ep_reward += dqn_reward
+            current_ppo_ep_reward += reward
+            current_dqn_ep_reward += 0
 
-            # update DQN agent
-            if dqn.memory_counter > cfg.memory_capacity:
-                dqn.learn()
+
 
             # update PPO agent
             if time_step % cfg.PPO.update_timestep == 0:
@@ -188,7 +182,6 @@ def train(cfg):
                     print("---------------------------------------------------")
                     print("Saving model at : " + checkpoint_path)
                     ppo_agent.save(checkpoint_path)
-                    dqn.save(checkpoint_path_dqn)
                     print("Model saved")
                     print("Elapsed Time  : ", 
                           datetime.now().replace(microsecond=0) - start_time)

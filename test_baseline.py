@@ -46,16 +46,13 @@ def test(cfg):
                     cfg.PPO.lr_critic, cfg.gamma, cfg.PPO.K_epochs, 
                     cfg.PPO.eps_clip, cfg.has_continuous_action_space, 
                     1e-10)
-    dqn = DQN(state_dim, dqn_action_dim, cfg.DQN.lr, 1e-10, 
-              cfg.DQN.target_iter_replace, cfg.DQN.batch_size, cfg.gamma)
+    
     run_num_pretrained = cfg.random_seed      #### set this to load a particular checkpoint num
 
     directory = "PPO_preTrained" + '/' + env_name + '/'
-    load_checkpoint_DQN = directory + "DQN_{}_{}.pth".format(cfg.mode, 
-                                                             run_num_pretrained)
+
     load_checkpoint_PPO = directory + "PPO_{}_{}.pth".format(cfg.mode, 
                                                              run_num_pretrained)
-    dqn.load(load_checkpoint_DQN)
     ppo_agent.load(load_checkpoint_PPO)
     # track total training time
     start_time = datetime.now().replace(microsecond=0)
@@ -85,7 +82,7 @@ def test(cfg):
             ppo_action = ppo_agent.select_action(state)
             
             if laneID == 'E3_0':
-                dqn_action = dqn.select_action(state)
+                dqn_action = ppo_action[1]
                 # print('dqn takes action')
             else:
                 dqn_action = 0
@@ -106,7 +103,7 @@ def test(cfg):
             action = info['action']
             ppo_action = action[0]
             dqn_action = action[1]
-
+            
             
             
             time_step +=1
