@@ -18,7 +18,7 @@
 **LISA** is a novel autonomous driving agent designed for safe on-ramp merging in mixed traffic conditions, achieving a 99.67% success rate. It uses latent-state inference to model unobservable factors, like other drivers' intents, enabling the agent to adapt to dynamic environments. An augmented version,**A-LISA**, addresses observation delays, maintaining an impressive 99.37% success rate even with 1-second vehicle-to-vehicle communication delays.
 
 <p align="center">
-  <img src='media/policyOptimization.pdf' width="750"/>
+  <img src='media/policyOptimization.png' width="750"/>
 </p>
 
 
