@@ -34,7 +34,7 @@ TD3:
   expl_noise: 0.1
   batch_size: 256
 
-total_test_episodes: 10
+total_test_episodes: 998
 mode: "Plain"
 delay: 1
 has_continuous_action_space: True  

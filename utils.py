@@ -17,7 +17,9 @@ def set_env(cfg):
     	cfg.mode == 'Plain' or \
         cfg.mode == 'SLSCD' or \
         cfg.mode == 'SLD' or \
-		cfg.mode == 'SL':
+		cfg.mode == 'SL' or \
+    	cfg.mode == 'SLSCPD' or \
+        cfg.mode == 'PD':
         from merging import Merging
         env = Merging(options= cfg, seed= cfg.random_seed)
     elif cfg.mode == 'Baseline' or cfg.mode == 'Baseline_D':

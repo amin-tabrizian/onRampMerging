@@ -8,8 +8,7 @@ TD3_preTrained/
 PPO_logs/
 PPO_preTrained/
 state_predictor/
-# train_baseline.py
-# merging_baseline.py
 *.out
+*.txt
 
 

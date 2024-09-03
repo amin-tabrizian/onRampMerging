@@ -180,7 +180,7 @@ class Merging():
             self.observation_space = spaces.Box(low = low_space, 
                                                 high = high_space, 
                                                 dtype=np.float32)
-        elif 'D' in mode:
+        elif 'D' in mode and 'P' not in mode:
             low_space = np.tile(np.float32([-1000]), 
                                 reps= (self.size - 1)*6 + 3)
             low_space = np.append(low_space, np.tile(np.float32([-1, -1]), 
@@ -192,6 +192,21 @@ class Merging():
             self.observation_space = spaces.Box(low = low_space, 
                                                 high = high_space, 
                                                 dtype=np.float32)
+        elif 'SLSCPD' == mode:
+            low_space = np.tile(np.float32([-1000]), 
+                                reps= (self.size - 1)*6 + 3)
+            high_space = np.tile(np.float32([1000]), 
+                                reps= (self.size - 1)*6 + 3)
+            self.observation_space = spaces.Box(low = low_space, 
+                                                high = high_space, 
+                                                dtype=np.float32)
+        elif 'PD' == mode: 
+            low_space = np.tile(np.float32([-1000, -1000, 0]), reps= self.size)
+            high_space = np.tile(np.float32([1000, 1000, 50]), reps= self.size)
+            self.observation_space = spaces.Box(low = low_space, 
+                                                high = high_space, 
+                                                dtype=np.float32)
+
 
 
         self.action_space = spaces.Box(low = -1,  high = 1, shape= (2,))
@@ -242,25 +257,32 @@ class Merging():
                 if 'f_2' in vehicle_name:
                     traci.vehicle.setTau(vehicle_name, np.random.normal((0.6 + 1.8)/2, 0.1))
                     traci.vehicle.setMaxSpeed(vehicle_name, np.random.uniform(8, 11))
-        if 'D' in self.options.mode:
+        if 'D' in self.options.mode and 'P' not in self.options.mode:
             self.action_history =np.zeros((self.d, 2))
             self.observation_history = np.zeros((self.d, len(self.state)))
             self.delay_counter = 0
             self.observation_history[0] = self.state
             return np.append(self.state, np.ndarray.flatten(self.action_history))
+        elif 'PD' in self.options.mode:
+            self.action_history =np.zeros((self.d, 2))
+            self.observation_history = np.zeros((self.d, len(self.state)))
+            self.delay_counter = 0
+            self.observation_history[0] = self.state
+            return self.state
+
         return self.state
         
         
 
     def step(self, action):
         info = False
-        if self.options.mode == "SLSCD":
+        if self.options.mode == "SLSCD" or self.options.mode == 'SLSCPD':
             self.delay_counter = (self.delay_counter + 1)%self.d
             self.observation_history[self.delay_counter] = self.state
             return_idx = max(0, self.counter - self.d)%self.d
             action = safetyCheck(self.observation_history[return_idx], action)
             self.action_history[self.delay_counter - 1] = action
-        elif self.options.mode == "SLD":
+        elif self.options.mode == "SLD" or self.options.mode == "PD":
             self.delay_counter = (self.delay_counter + 1)%self.d
             self.observation_history[self.delay_counter] = self.state
             return_idx = max(0, self.counter - self.d)%self.d
@@ -318,8 +340,12 @@ class Merging():
         if self.done:
             traci.close()
         
-        if 'D' in self.options.mode:
+        if 'D' in self.options.mode and 'P' not in self.options.mode:
             return np.append(self.observation_history[return_idx], self.action_history), \
+                    self.reward, self.done, \
+                    {'message': info, 'lane': self.laneID, 'action': action}
+        elif 'PD' in self.options.mode:
+            return self.observation_history[return_idx], \
                     self.reward, self.done, \
                     {'message': info, 'lane': self.laneID, 'action': action}
 

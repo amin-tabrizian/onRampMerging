@@ -33,8 +33,8 @@ def test(cfg):
 
     # state and action space dimension
     state_dim = env.observation_space.shape[0]
-    ppo_action_dim = 1
-    dqn_action_dim = 2
+    ppo_action_dim = 2
+    # dqn_action_dim = 2
 
 
     print("===================================================================")
@@ -90,8 +90,8 @@ def test(cfg):
             
             action = [float(ppo_action[0]), dqn_action]
             observation, reward, done, info = env.step(action)
-            ppo_reward = reward[0]
-            dqn_reward = reward[1]
+            ppo_reward = reward
+            dqn_reward = 0
            
             laneID = info['lane']
             # print(reward)

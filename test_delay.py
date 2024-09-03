@@ -51,12 +51,22 @@ def test(cfg):
     run_num_pretrained = cfg.random_seed      #### set this to load a particular checkpoint num
 
     directory = "PPO_preTrained" + '/' + env_name + '/'
-    load_checkpoint_DQN = directory + "DQN_{}_{}.pth".format(cfg.mode, 
+    if cfg.mode == 'SLSCPD':
+        load_mode = 'SLSC'
+        load_delay = ''
+    elif cfg.mode == 'PD':
+        load_mode = 'Plain'
+        load_delay = ''
+    else:
+        load_mode = cfg.mode
+        load_delay = cfg.delay
+    load_checkpoint_DQN = directory + "DQN_{}_{}.pth".format(load_mode + str(load_delay), 
                                                              run_num_pretrained)
-    load_checkpoint_PPO = directory + "PPO_{}_{}.pth".format(cfg.mode, 
+    load_checkpoint_PPO = directory + "PPO_{}_{}.pth".format(load_mode + str(load_delay), 
                                                              run_num_pretrained)
     dqn.load(load_checkpoint_DQN)
     ppo_agent.load(load_checkpoint_PPO)
+    print('Loading models from: ', load_checkpoint_DQN, ' and ', load_checkpoint_PPO)
     # track total training time
     start_time = datetime.now().replace(microsecond=0)
     print("Started training at (GMT) : ", start_time)
