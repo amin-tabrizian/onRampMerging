@@ -10,10 +10,7 @@ simulator.
 
 """
 import os
-import glob
-import time
 from datetime import datetime
-import argparse
 import torch
 from agents.ppo import PPO
 import numpy as np
