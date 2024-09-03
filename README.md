@@ -38,9 +38,29 @@ url={https://openreview.net/forum?id=ezCsMOy1w9}
 
 ``` -->
 
-## Instructions
+## Instructions (macOS)
+Assuming that you already have [SUMO](https://sumo.dlr.de/docs/Installing/index.html) installed, install dependencies using `pip3`:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip3 install -r requirements.txt 
+```
+After installing dependencies, you can train **LISA** agent by calling:
+```
+CUDA_VISIBLE_DEVICES=X python3 train.py mode=${TRAINING_MODE} 
+```
+List of training modes are: `SLSC` for full agent, Plain for LISA without SL and SC netwroks, `SLSCD` for A-LISA, and `PD` for observing LISA's behavior in a delayed environment. There is also another agent for comparison called `Baseline`, for that you need to run `train_baseline.py`.
+To test a trained agent, you can call:
+```
+pyton3 test.py mode=${TEST_MODE} random_seed=${TRAINED_RANDOM_SEED}
+```
 
-<!-- Assuming that you already have [MuJoCo](http://www.mujoco.org) installed, install dependencies using `conda`:
+By providing the random seed, the corrosponding networks will be loaded. For testing the agents behavior on a delayed case, you have to run `test_delay.py`
+
+
+
+
+ <!-- Assuming that you already have [MuJoCo](http://www.mujoco.org) installed, install dependencies using `conda`:
 
 ```
 conda env create -f environment.yml
@@ -58,7 +78,7 @@ To train a **DrQ-v2** agent:
 CUDA_VISIBLE_DEVICES=X python train.py agent=drqv2 task=quadruped_run exp_name=${EXP_NAME} 
 ```
 
-Evaluation videos and model weights can be saved with arguments `save_video=True` and `save_model=True`. Refer to the `cfgs` directory for a full list of options and default hyperparameters. -->
+Evaluation videos and model weights can be saved with arguments `save_video=True` and `save_model=True`. Refer to the `cfgs` directory for a full list of options and default hyperparameters. --> -->
 
 
 ## Acknowledgement
