@@ -1,5 +1,6 @@
 tripinfo.xml
 .venv/
+.vscode/
 outputs/
 multirun/
 TD3_logs/
