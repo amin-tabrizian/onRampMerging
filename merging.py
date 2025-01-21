@@ -233,7 +233,7 @@ class Merging():
             #             "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
             #             "--random", "--step-length", "0.1", "--collision.check-junctions"])
             traci.start([self.sumoBinary, "-c", HOME + SUMO,
-                        "--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
+                        "x--tripinfo-output", "tripinfo.xml",  "--no-step-log", \
                         "--random", "--collision.check-junctions", "--collision.action", "remove"])
         
         self.done = False

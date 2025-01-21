@@ -1,6 +1,8 @@
 tripinfo.xml
 .venv/
 .vscode/
+PPO_logs_*/
+PPO_preTrained_*/
 outputs/
 multirun/
 TD3_logs/
@@ -10,5 +12,11 @@ PPO_logs/
 PPO_preTrained/
 state_predictor/
 *.out
+*.ipynb
+*.npy
+*.csv
+__pycache__
+
+
 
 

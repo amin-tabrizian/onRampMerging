@@ -35,10 +35,10 @@ TD3:
   batch_size: 256
 
 total_test_episodes: 998
-mode: "Plain"
+mode: "SLSC"
 delay: 1
 has_continuous_action_space: True  
-max_training_timesteps: 1000000   
+max_training_timesteps: 300000   
 log_freq: ${max_ep_len} * 2          
 save_model_freq: 5000     
 memory_capacity: 20000   

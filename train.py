@@ -18,6 +18,7 @@ from agents.dqn import DQN
 import hydra
 from omegaconf import DictConfig
 from utils import set_env
+import traci
 
 
 def train(cfg):
@@ -36,7 +37,8 @@ def train(cfg):
     ###################### logging ######################
 
     #### log files for multiple runs are NOT overwritten
-    log_dir = "PPO_logs"
+    difficulty = "Hard"
+    log_dir = "PPO_logs_" + difficulty
     if not os.path.exists(log_dir):
           os.makedirs(log_dir)
 
@@ -50,7 +52,7 @@ def train(cfg):
     print("logging at : " + log_f_name)
 
     ################### checkpointing ###################
-    directory = "PPO_preTrained"
+    directory = "PPO_preTrained_" + difficulty
     if not os.path.exists(directory):
           os.makedirs(directory)
 
@@ -103,10 +105,18 @@ def train(cfg):
     best_reward = -float('inf')
     saving_reward = 0
     laneID = ''
+    egoSpeedList = []
+    egoAveSpeedList = []
     # training loop
+    if cfg.mode == 'SLSC':
+        idx = 92
+    elif cfg.mode == 'Plain':
+        idx = 47
     while time_step <= (cfg.max_training_timesteps):
 
         state = env.reset()
+        egoVel = state[idx]
+        egoSpeedList.append(egoVel)
         current_ppo_ep_reward = 0
         current_dqn_ep_reward = 0
         done = False
@@ -124,6 +134,8 @@ def train(cfg):
             
             action = [float(ppo_action[0]), dqn_action]
             observation, reward, done, info = env.step(action)
+            egoVel = state[idx]
+            egoSpeedList.append(egoVel)
             ppo_reward = reward[0]
             dqn_reward = reward[1]
             laneID = info['lane']
@@ -194,10 +206,12 @@ def train(cfg):
             
             # break; if the episode is over
             if done:
+                egoAveSpeedList.append(sum(egoSpeedList)/len(egoSpeedList))
+                egoSpeedList = []
                 break
             state = observation
 
-
+        
         log_ppo_running_reward += current_ppo_ep_reward
         log_dqn_running_reward += current_dqn_ep_reward
         saving_reward += log_ppo_running_reward + log_dqn_running_reward
@@ -205,7 +219,7 @@ def train(cfg):
 
         i_episode += 1
         
-
+    np.save(log_dir + "Speed_{}_{}.npy".format(cfg.mode + str(cfg.delay), cfg.random_seed), egoAveSpeedList)
     log_f.close()
 
     # print total training time

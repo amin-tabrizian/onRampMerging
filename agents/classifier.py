@@ -2,14 +2,15 @@ import torch.nn as nn
 
 
 # Define a CNN model with a fully connected layer for classification
-class CNNClassifier(nn.Module):
+class Classifier(nn.Module):
     def __init__(self, input_size, output_size):
-        super(CNNClassifier, self).__init__()
-        self.fc1 = nn.Linear(input_size, 512)
-        self.fc2 = nn.Linear(512, 256)
+        super(Classifier, self).__init__()
+        self.fc1 = nn.Linear(input_size, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, output_size) 
         self.relu = nn.ReLU()
-        self.fc3 = nn.Linear(256, output_size)  # Adjust the input size based on your data
 
+        self.softmax = nn.Softmax()
     def forward(self, x):
         x = self.fc1(x)
         x = self.relu(x)
@@ -17,4 +18,5 @@ class CNNClassifier(nn.Module):
         x = self.relu(x)
         x = self.fc3(x)
         x = self.relu(x)
+        # x = self.softmax(x)
         return x

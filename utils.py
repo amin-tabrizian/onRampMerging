@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from agents.classifier import CNNClassifier
+from agents.classifier import Classifier
 
 def getDistance(pos1, pos2):
     return np.sqrt((pos1[0] - pos2[0])**2 + (pos1[1] - pos2[1])**2)
@@ -33,9 +33,9 @@ def predict_driving_style(non_ego_state):
 
     input_size = 90 
     output_size = 90
-    model = CNNClassifier(input_size, output_size)
+    model = Classifier(input_size, output_size)
     model.eval()
-    model.load_state_dict(torch.load('slagent.pth'))
+    model.load_state_dict(torch.load('slagent.pth', weights_only=True ))
     non_ego_state = np.array(non_ego_state).astype(np.float32)
     with torch.no_grad():
         output = model(torch.from_numpy(non_ego_state)).numpy()
