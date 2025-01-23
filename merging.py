@@ -19,6 +19,11 @@ else:
 import traci
 from sumolib import checkBinary
 
+def isEmergencyBraking():
+    for vehID in traci.vehicle.getIDList():
+        if traci.vehicle.getAcceleration(vehID) < -4.5:
+            return True
+    return False
 
 def safetyCheck(state, action):
     egoidx = int((len(state) - 1)/2) - 1
@@ -117,7 +122,7 @@ def getState(radius, size= 99, mode= 'Plain'):
 def getReward(state, action, laneID):
     # ego_start_idx = int((len(state) - 1)/2) -1
     # ego_pos = state[ego_start_idx:ego_start_idx + 2]
-    r1 = -0.01*np.abs(action[0]) - 1
+    r1 = -0.01*np.abs(action[0]) - 5
     r2 = 0
 
     if 't_0' in traci.simulation.getCollidingVehiclesIDList():
@@ -129,6 +134,9 @@ def getReward(state, action, laneID):
     
     elif 't_0' in traci.simulation.getArrivedIDList(): 
         r1 += 200
+        return [0.1*r1, 0.1*r2]
+    elif isEmergencyBraking(): 
+        r2 -= 200
         return [0.1*r1, 0.1*r2]
     
 
@@ -331,6 +339,12 @@ class Merging():
                 info = True
                 observationArray = getState(self.radius, self.size, self.options.mode)
                 self.state = observationArray
+            elif isEmergencyBraking():
+                self.done = True
+                info = True
+                observationArray = getState(self.radius, self.size, self.options.mode)
+                self.state = observationArray
+                
             else:
                 observationArray = getState(self.radius, self.size, self.options.mode)
                 self.state = observationArray
